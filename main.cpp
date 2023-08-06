@@ -1,33 +1,43 @@
-#include <iostream>
+#include <stdio.h>
 #include <SDL2/SDL.h>
-using namespace std;
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 800, HEIGHT = 600;
 
-int main(int argc, char *argv[])
-{
-    SDL_Init(SDL_INIT_EVERYTHING);
+int main(int argc, char *argv[]) {
+  SDL_Window *window;
+  SDL_Renderer *renderer;
+  if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+    printf("SDL_Init failed: %s\n", SDL_GetError());
+    return 1;
+  }
 
-    SDL_Window *window = SDL_CreateWindow("2D Platforming Physics", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
+  window = SDL_CreateWindow("2D Platforming Physics",
+                                        SDL_WINDOWPOS_UNDEFINED,
+                                        SDL_WINDOWPOS_UNDEFINED,
+                                        WIDTH, HEIGHT,
+                                        SDL_WINDOW_ALLOW_HIGHDPI);
+  if(window == NULL) {
+    printf("Could not create window: %s\n", SDL_GetError());
+    return 1;
+  }
+  
+  renderer = SDL_CreateRenderer(window, -1, 0);
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+  SDL_RenderClear(renderer);
 
-    if (NULL == window){
-        cout << "Could not create window: " << SDL_GetError() << endl;
-        return 1;
+  SDL_RenderPresent(renderer);
+  
+  SDL_Event event;
+  while(1) {
+    if(SDL_PollEvent(&event)) {
+      if(event.type == SDL_QUIT) {
+        break;
+      }
     }
+  }
 
-    SDL_Event windowEvent;
+  SDL_DestroyWindow(window);
 
-    while (true){
-        if (SDL_PollEvent(&windowEvent)){
-            if (SDL_QUIT == windowEvent.type){
-                break;
-            }
-        }
-    }
-
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    return EXIT_SUCCESS;
+  SDL_Quit();
+  return 0;
 }
